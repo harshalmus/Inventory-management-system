@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block auth_content %}
+<div class="auth-wrapper">
+  <div class="auth-card row g-0">
+    <div class="col-md-5 auth-side d-none d-md-flex">
+      <i class="bi bi-box-seam-fill" style="font-size: 3rem;"></i>
+      <h2 class="fw-bold mt-3">StockPilot IMS</h2>
+      <p class="mb-4 opacity-75">A complete inventory management system to track products, suppliers, purchases and stock &mdash; all in one place.</p>
+      <ul class="list-unstyled small opacity-75">
+        <li class="mb-2"><i class="bi bi-check-circle me-2"></i>Real-time stock tracking</li>
+        <li class="mb-2"><i class="bi bi-check-circle me-2"></i>Supplier &amp; purchase management</li>
+        <li class="mb-2"><i class="bi bi-check-circle me-2"></i>Exportable reports (PDF / CSV)</li>
+      </ul>
+    </div>
+    <div class="col-md-7 auth-form-side">
+      <h3 class="fw-bold mb-1">Welcome back</h3>
+      <p class="text-muted mb-4">Sign in to manage your inventory</p>
+
+      <!-- Flash messages shown here since header/sidebar aren't rendered pre-login -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ 'danger' if category == 'danger' else category }} py-2" role="alert">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('main.login') }}" class="needs-validation" novalidate>
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+          <label class="form-label">Username</label>
+          {{ form.username(class="form-control form-control-lg", placeholder="Enter username", autofocus=true) }}
+          {% for error in form.username.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Password</label>
+          {{ form.password(class="form-control form-control-lg", placeholder="Enter password") }}
+          {% for error in form.password.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="form-check mb-3">
+          {{ form.remember(class="form-check-input") }}
+          <label class="form-check-label small">Remember me</label>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg w-100">
+          <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+        </button>
+      </form>
+
+      <div class="demo-creds mt-4">
+        <strong class="d-block mb-1"><i class="bi bi-info-circle me-1"></i>Demo credentials</strong>
+        Admin &mdash; username: <code>admin</code> / password: <code>admin123</code><br>
+        Staff &mdash; username: <code>staff</code> / password: <code>staff123</code>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Purchase {{ purchase.invoice_number }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+  <div>
+    <h1 class="section-title">Purchase Invoice</h1>
+    <p class="section-sub mb-0">{{ purchase.invoice_number }}</p>
+  </div>
+  <a href="{{ url_for('main.purchases') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back to Purchases</a>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-4">
+    <div class="card h-100"><div class="card-body">
+      <div class="text-muted small">Supplier</div>
+      <div class="fw-semibold fs-5">{{ purchase.supplier.name }}</div>
+      <div class="text-muted small">{{ purchase.supplier.company or '' }}</div>
+    </div></div>
+  </div>
+  <div class="col-md-4">
+    <div class="card h-100"><div class="card-body">
+      <div class="text-muted small">Purchase Date</div>
+      <div class="fw-semibold fs-5">{{ purchase.purchase_date.strftime('%d %B %Y') }}</div>
+    </div></div>
+  </div>
+  <div class="col-md-4">
+    <div class="card h-100"><div class="card-body">
+      <div class="text-muted small">Total Amount</div>
+      <div class="fw-semibold fs-5">{{ purchase.total_amount|currency }}</div>
+    </div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">Line Items</div>
+  <div class="table-responsive">
+    <table class="table mb-0 align-middle">
+      <thead><tr><th>Product</th><th>Code</th><th class="text-end">Quantity</th><th class="text-end">Cost Price</th><th class="text-end">Line Total</th></tr></thead>
+      <tbody>
+        {% for item in purchase.items %}
+        <tr>
+          <td>{{ item.product.name if item.product else 'Deleted Product' }}</td>
+          <td><code>{{ item.product.product_code if item.product else '-' }}</code></td>
+          <td class="text-end">{{ item.quantity }}</td>
+          <td class="text-end">{{ item.cost_price|currency }}</td>
+          <td class="text-end">{{ item.line_total|currency }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr><td colspan="4" class="text-end fw-bold">Grand Total</td><td class="text-end fw-bold">{{ purchase.total_amount|currency }}</td></tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+{% if purchase.notes %}
+<div class="card mt-3"><div class="card-body"><strong>Notes:</strong> {{ purchase.notes }}</div></div>
+{% endif %}
+{% endblock %}

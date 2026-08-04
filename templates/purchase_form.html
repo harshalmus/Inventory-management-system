@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}New Purchase{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <h1 class="section-title">New Purchase</h1>
+  <p class="section-sub mb-0">Record a purchase invoice - stock will be updated automatically</p>
+</div>
+
+<form method="POST" class="needs-validation" novalidate id="purchaseForm">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="card mb-3">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Supplier *</label>
+          <select name="supplier_id" class="form-select" required>
+            <option value="">-- Select Supplier --</option>
+            {% for s in suppliers %}
+            <option value="{{ s.id }}">{{ s.name }} {% if s.company %}({{ s.company }}){% endif %}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Purchase Date *</label>
+          <input type="date" name="purchase_date" class="form-control" value="{{ today }}" required>
+        </div>
+        <div class="col-md-5">
+          <label class="form-label">Notes</label>
+          <input type="text" name="notes" class="form-control" placeholder="Optional notes">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      Product Line Items
+      <button type="button" class="btn btn-sm btn-primary" id="addLineBtn"><i class="bi bi-plus-lg me-1"></i>Add Item</button>
+    </div>
+    <div class="table-responsive">
+      <table class="table mb-0 align-middle" id="lineItemsTable">
+        <thead>
+          <tr>
+            <th style="min-width:220px;">Product</th>
+            <th style="width:120px;">Quantity</th>
+            <th style="width:150px;">Cost Price (₹)</th>
+            <th style="width:130px;" class="text-end">Line Total</th>
+            <th style="width:50px;"></th>
+          </tr>
+        </thead>
+        <tbody id="lineItemsBody"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" class="text-end fw-bold">Grand Total</td>
+            <td class="text-end fw-bold" id="grandTotal">₹0.00</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <button type="submit" class="btn btn-primary px-4"><i class="bi bi-check-lg me-1"></i>Save Purchase</button>
+    <a href="{{ url_for('main.purchases') }}" class="btn btn-outline-secondary px-4">Cancel</a>
+  </div>
+</form>
+
+<!-- Row template -->
+<template id="lineItemTemplate">
+  <tr>
+    <td>
+      <select name="product_id[]" class="form-select product-select" required>
+        <option value="">-- Select Product --</option>
+        {% for p in products %}
+        <option value="{{ p.id }}" data-price="{{ p.purchase_price }}">{{ p.product_code }} - {{ p.name }}</option>
+        {% endfor %}
+      </select>
+    </td>
+    <td><input type="number" name="quantity[]" class="form-control qty-input" min="1" value="1" required></td>
+    <td><input type="number" name="cost_price[]" class="form-control price-input" min="0" step="0.01" required></td>
+    <td class="text-end line-total">₹0.00</td>
+    <td class="text-end"><button type="button" class="btn btn-sm btn-outline-danger remove-line"><i class="bi bi-trash"></i></button></td>
+  </tr>
+</template>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const body = document.getElementById('lineItemsBody');
+  const template = document.getElementById('lineItemTemplate');
+  const addBtn = document.getElementById('addLineBtn');
+  const grandTotalEl = document.getElementById('grandTotal');
+
+  function formatCurrency(n) { return '₹' + n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+  function recalcRow(row) {
+    const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+    const price = parseFloat(row.querySelector('.price-input').value) || 0;
+    const total = qty * price;
+    row.querySelector('.line-total').textContent = formatCurrency(total);
+    recalcGrandTotal();
+  }
+
+  function recalcGrandTotal() {
+    let total = 0;
+    body.querySelectorAll('tr').forEach(row => {
+      const qty = parseFloat(row.querySelector('.qty-input')?.value) || 0;
+      const price = parseFloat(row.querySelector('.price-input')?.value) || 0;
+      total += qty * price;
+    });
+    grandTotalEl.textContent = formatCurrency(total);
+  }
+
+  function addLine() {
+    const clone = template.content.cloneNode(true);
+    const row = clone.querySelector('tr');
+    body.appendChild(clone);
+    const newRow = body.lastElementChild;
+
+    newRow.querySelector('.product-select').addEventListener('change', function () {
+      const opt = this.selectedOptions[0];
+      const price = opt ? opt.getAttribute('data-price') : 0;
+      newRow.querySelector('.price-input').value = price || 0;
+      recalcRow(newRow);
+    });
+    newRow.querySelector('.qty-input').addEventListener('input', () => recalcRow(newRow));
+    newRow.querySelector('.price-input').addEventListener('input', () => recalcRow(newRow));
+    newRow.querySelector('.remove-line').addEventListener('click', function () {
+      newRow.remove();
+      recalcGrandTotal();
+    });
+  }
+
+  addBtn.addEventListener('click', addLine);
+  addLine(); // start with one row
+});
+</script>
+{% endblock %}

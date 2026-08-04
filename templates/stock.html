@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}Stock Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+  <div>
+    <h1 class="section-title">Stock Management</h1>
+    <p class="section-sub mb-0">Monitor and manually adjust stock levels</p>
+  </div>
+  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#adjustStockModal">
+    <i class="bi bi-sliders me-1"></i>Adjust Stock
+  </button>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <form method="get" class="row g-2">
+      <div class="col-md-5">
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input type="text" name="q" class="form-control" placeholder="Search by name or code..." value="{{ search }}">
+        </div>
+      </div>
+      <div class="col-md-2 d-grid"><button class="btn btn-primary" type="submit">Search</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card h-100">
+      <div class="card-header">Current Stock Levels</div>
+      <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+          <thead><tr><th>Product</th><th>Code</th><th class="text-end">Qty</th><th style="width:140px;">Level</th><th>Status</th></tr></thead>
+          <tbody>
+            {% for p in products %}
+            <tr>
+              <td>{{ p.name }}</td>
+              <td><code>{{ p.product_code }}</code></td>
+              <td class="text-end">{{ p.quantity }}</td>
+              <td>
+                {% set pct = ((p.quantity / (threshold * 3)) * 100) if threshold else 0 %}
+                {% set pct = 100 if pct > 100 else pct %}
+                <div class="progress stock-progress">
+                  <div class="progress-bar {{ 'bg-danger' if p.stock_status=='out' else 'bg-warning' if p.stock_status=='low' else 'bg-success' }}"
+                       role="progressbar" style="width: {{ pct }}%;"></div>
+                </div>
+              </td>
+              <td>
+                {% if p.stock_status == 'out' %}<span class="badge badge-status-out">Out</span>
+                {% elif p.stock_status == 'low' %}<span class="badge badge-status-low">Low</span>
+                {% else %}<span class="badge badge-status-ok">OK</span>{% endif %}
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5"><div class="empty-state"><i class="bi bi-boxes"></i>No products found.</div></td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card h-100">
+      <div class="card-header">Recent Stock Adjustments</div>
+      <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+          <thead><tr><th>Product</th><th class="text-end">Change</th><th>Reason</th><th>By</th></tr></thead>
+          <tbody>
+            {% for h in history %}
+            <tr>
+              <td>{{ h.product.name if h.product else '—' }}</td>
+              <td class="text-end">
+                {% if h.change > 0 %}<span class="text-success fw-semibold">+{{ h.change }}</span>
+                {% else %}<span class="text-danger fw-semibold">{{ h.change }}</span>{% endif %}
+              </td>
+              <td class="text-muted small">{{ h.reason or '—' }}</td>
+              <td class="text-muted small">{{ h.adjusted_by or '—' }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4"><div class="empty-state"><i class="bi bi-clock-history"></i>No adjustments recorded yet.</div></td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Adjust Stock Modal -->
+<div class="modal fade" id="adjustStockModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" action="{{ url_for('main.stock_adjust') }}" class="needs-validation" novalidate>
+        {{ form.hidden_tag() }}
+        <div class="modal-header">
+          <h5 class="modal-title">Manual Stock Adjustment</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Product *</label>
+            {{ form.product_id(class="form-select", required=true) }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Adjustment Type *</label>
+            {{ form.change_type(class="form-select") }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Quantity *</label>
+            {{ form.quantity(class="form-control", required=true, min="1") }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Reason</label>
+            {{ form.reason(class="form-control", placeholder="e.g. Damaged goods, stock recount...") }}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Apply Adjustment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
