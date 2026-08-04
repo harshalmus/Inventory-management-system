@@ -115,8 +115,8 @@ categories, 4 suppliers, 15 products, and 5 sample purchases.
 
 | Role  | Username | Password  |
 |-------|----------|-----------|
-| Admin | `admin`  | `admin123`|
-| Staff | `staff`  | `staff123`|
+| Admin | `admin`  |           |
+| Staff | `staff`  |           |
 
 > ⚠️ Change these credentials (or create new users directly in the database)
 > before deploying anywhere public.
