@@ -90,20 +90,49 @@ inventory_management/
 
 ### 2. Setup
 
-```bash
-# 1. Navigate into the project folder
+# Quick Start — Run locally
+
+Copy the commands for your platform and run them in a terminal from the
+project root (`inventory_management`). These steps create a virtual
+environment, install dependencies, and start the Flask server.
+
+Windows (PowerShell):
+
+```powershell
 cd inventory_management
-
-# 2. (Recommended) create a virtual environment
 python -m venv venv
-source venv/bin/activate        # on Windows: venv\Scripts\activate
-
-# 3. Install dependencies
+venv\Scripts\Activate.ps1     # or: .\venv\Scripts\activate
+python -m pip install --upgrade pip setuptools wheel
 pip install -r requirements.txt
-
-# 4. Run the app
 python app.py
 ```
+
+macOS / Linux (bash / zsh):
+
+```bash
+cd inventory_management
+python -m venv venv
+source venv/bin/activate
+python -m pip install --upgrade pip setuptools wheel
+pip install -r requirements.txt
+python app.py
+```
+
+Open the app at: http://127.0.0.1:5000
+
+Troubleshooting
+- If you see import errors for packages like `werkzeug` or `flask`,
+  recreate the virtualenv and upgrade `pip` first (see commands above).
+- If Windows blocks script execution, run PowerShell as Administrator and
+  enable script execution for the session:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
+- If the database is missing, the app will create `database/inventory.db`
+  on first run. If you want to reset demo data, remove that file and
+  restart the app.
 
 The app will start at **http://127.0.0.1:5000**
 
@@ -118,7 +147,8 @@ categories, 4 suppliers, 15 products, and 5 sample purchases.
 | Admin | `admin`  |           |
 | Staff | `staff`  |           |
 
-
+> ⚠️ Change these credentials (or create new users directly in the database)
+> before deploying anywhere public.
 
 ---
 
