@@ -13,44 +13,55 @@
         <li class="mb-2"><i class="bi bi-check-circle me-2"></i>Exportable reports (PDF / CSV)</li>
       </ul>
     </div>
-    <div class="col-md-7 auth-form-side">
-      <h3 class="fw-bold mb-1">Welcome back</h3>
-      <p class="text-muted mb-4">Sign in to manage your inventory</p>
+    <div class="col-md-7 auth-form-side d-flex flex-column justify-content-between p-4 p-lg-5">
+      <div>
+        <h3 class="fw-bold mb-1">Welcome back</h3>
+        <p class="text-muted mb-4">Sign in to manage your inventory</p>
 
-      <!-- Flash messages shown here since header/sidebar aren't rendered pre-login -->
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          {% for category, message in messages %}
-            <div class="alert alert-{{ 'danger' if category == 'danger' else category }} py-2" role="alert">{{ message }}</div>
-          {% endfor %}
-        {% endif %}
-      {% endwith %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ 'danger' if category == 'danger' else category }} py-2" role="alert">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
 
-      <form method="POST" action="{{ url_for('main.login') }}" class="needs-validation" novalidate>
-        {{ form.hidden_tag() }}
-        <div class="mb-3">
-          <label class="form-label">Username</label>
-          {{ form.username(class="form-control form-control-lg", placeholder="Enter username", autofocus=true) }}
-          {% for error in form.username.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Password</label>
-          {{ form.password(class="form-control form-control-lg", placeholder="Enter password") }}
-          {% for error in form.password.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
-        </div>
-        <div class="form-check mb-3">
-          {{ form.remember(class="form-check-input") }}
-          <label class="form-check-label small">Remember me</label>
-        </div>
-        <button type="submit" class="btn btn-primary btn-lg w-100">
-          <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
-        </button>
-      </form>
+        <form method="POST" action="{{ url_for('main.login') }}" class="needs-validation" novalidate>
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Username</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+              {{ form.username(class="form-control form-control-lg", placeholder="Enter username", autofocus=true) }}
+            </div>
+            {% for error in form.username.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <label class="form-label fw-semibold mb-0">Password</label>
+              <a href="#" class="text-decoration-none small text-muted">Forgot password?</a>
+            </div>
+            <div class="input-group mt-1">
+              <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
+              {{ form.password(class="form-control form-control-lg", placeholder="Enter password") }}
+            </div>
+            {% for error in form.password.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="form-check mb-4">
+            {{ form.remember(class="form-check-input") }}
+            <label class="form-check-label small text-secondary">Keep me signed in on this device</label>
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm">
+            <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+          </button>
+        </form>
+      </div>
 
-      <div class="demo-creds mt-4">
-        <strong class="d-block mb-1"><i class="bi bi-info-circle me-1"></i>Demo credentials</strong>
-        Admin &mdash; username: <code>admin</code> / password: <code>admin123</code><br>
-        Staff &mdash; username: <code>staff</code> / password: <code>staff123</code>
+      <div class="pt-4 mt-4 border-top text-center text-muted small">
+        <div class="d-flex align-items-center justify-content-center gap-2">
+          <i class="bi bi-shield-check text-success"></i>
+          <span>Secure Enterprise Access</span>
+        </div>
       </div>
     </div>
   </div>
