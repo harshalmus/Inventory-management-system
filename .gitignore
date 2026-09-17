@@ -9,3 +9,5 @@ static/images/products/*
 .env
 instance/
 *.log
+~$*
+*.tmp

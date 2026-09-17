@@ -1,0 +1,25 @@
+# ==============================================================================
+# Netlify Configuration File
+# ==============================================================================
+# IMPORTANT NOTICE:
+# Netlify is a static website and Node.js serverless hosting platform.
+# It does NOT natively support running persistent Python backend web servers (Flask)
+# or persistent local SQLite databases.
+#
+# To deploy StockPilot IMS live for free with full database functionality,
+# please use RENDER (https://render.com) using the included:
+#   - Procfile
+#   - render.yaml
+#
+# See DEPLOYMENT_GUIDE.md for step-by-step instructions.
+# ==============================================================================
+
+[build]
+  publish = "static"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+
